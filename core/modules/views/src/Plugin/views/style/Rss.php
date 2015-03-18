@@ -8,8 +8,10 @@
 namespace Drupal\views\Plugin\views\style;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Default style plugin to render an RSS feed.
@@ -31,7 +33,13 @@ class Rss extends StylePluginBase {
    *
    * @var bool
    */
+
+  protected $configFactory;
   protected $usesRowPlugin = TRUE;
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->configFactory = $config_factory;
+ }
 
   public function attachTo(array &$build, $display_id, Url $feed_url, $title) {
     $url_options = array();
@@ -42,6 +50,9 @@ class Rss extends StylePluginBase {
     $url_options['absolute'] = TRUE;
 
     $url = $feed_url->setOptions($url_options)->toString();
+    if ($this->view->display_handler->getOption('sitename_title')) {
+	$title = $this->configFactory->get('system.site')->get('name');
+    }
 
     // Add the RSS icon to the view.
     $this->view->feedIcons[] = [

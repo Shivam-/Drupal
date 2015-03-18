@@ -68,12 +68,14 @@ class DisplayFeedTest extends PluginTestBase {
     $view->getExecutable()->newDisplay('block', NULL, 'test');
     $display = &$view->getDisplay('feed_1');
     $display['display_options']['displays']['test'] = 'test';
+    $display['display_options']['sitename_title'] = 1;
     $view->save();
     // Test the feed display adds a feed icon to the block display.
     $this->drupalPlaceBlock('views_block:test_display_feed-test');
     $this->drupalGet('<front>');
     $feed_icon = $this->cssSelect('div.view-id-test_display_feed a.feed-icon');
     $this->assertTrue(strpos($feed_icon[0]['href'], 'test-feed-display.xml'), 'The feed icon was found.');
+     $this->assertEqual($feed_icon[0]['title'], 'Subscribe to '. $site_name, 'The feed icon title contains the site name.');
   }
 
   /**
