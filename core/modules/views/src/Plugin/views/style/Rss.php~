@@ -149,5 +149,13 @@ class Rss extends StylePluginBase {
     unset($this->view->row_index);
     return $build;
   }
+public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory')
+    );
+  }
 
 }
