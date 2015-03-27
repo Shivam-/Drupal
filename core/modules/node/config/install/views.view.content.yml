@@ -495,6 +495,16 @@ display:
           empty: true
           content: 'No content available.'
           plugin_id: text_custom
+        node_listing_empty:
+          id: node_listing_empty
+          table: node
+          field: node_listing_empty
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          entity_type: node
+          plugin_id: node_listing_empty
       arguments: {  }
       relationships:
         uid:

@@ -1,0 +1,13 @@
+diff --git a/core/modules/node/node.links.menu.yml b/core/modules/node/node.links.menu.yml
+index a197494..3392a96 100644
+--- a/core/modules/node/node.links.menu.yml
++++ b/core/modules/node/node.links.menu.yml
+@@ -1,7 +1,7 @@
+ node.overview_types:
+   title: 'Content types'
+   parent: system.admin_structure
+-  description: 'Manage content types, including default status, front page promotion, comment settings, etc.'
++  description: 'Add content types to your site and/or manage their structure and display, including default form values, field settings, etc.'
+   route_name: node.overview_types
+ node.add_page:
+   title: 'Add content'

@@ -1,0 +1,13 @@
+diff --git a/core/lib/Drupal.php b/core/lib/Drupal.php
+index 363cf12..cc60a97 100644
+--- a/core/lib/Drupal.php
++++ b/core/lib/Drupal.php
+@@ -80,7 +80,7 @@ class Drupal {
+   /**
+    * The current system version.
+    */
+-  const VERSION = '8.0.0-dev';
++  const VERSION = '8.0.0-beta1';
+ 
+   /**
+    * Core API compatibility.

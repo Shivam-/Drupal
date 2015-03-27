@@ -163,6 +163,8 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
             'entity.query.config' => 'getEntity_Query_ConfigService',
             'entity.query.keyvalue' => 'getEntity_Query_KeyvalueService',
             'entity.query.sql' => 'getEntity_Query_SqlService',
+            'entity_browser.route_subscriber' => 'getEntityBrowser_RouteSubscriberService',
+            'entity_embed.post_render_cache' => 'getEntityEmbed_PostRenderCacheService',
             'entity_route_subscriber' => 'getEntityRouteSubscriberService',
             'event_dispatcher' => 'getEventDispatcherService',
             'exception.custom_page_html' => 'getException_CustomPageHtmlService',
@@ -209,6 +211,10 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
             'form_builder' => 'getFormBuilderService',
             'form_submitter' => 'getFormSubmitterService',
             'form_validator' => 'getFormValidatorService',
+            'forum.breadcrumb.listing' => 'getForum_Breadcrumb_ListingService',
+            'forum.breadcrumb.node' => 'getForum_Breadcrumb_NodeService',
+            'forum.index_storage' => 'getForum_IndexStorageService',
+            'forum_manager' => 'getForumManagerService',
             'http_client' => 'getHttpClientService',
             'http_kernel' => 'getHttpKernelService',
             'http_kernel.basic' => 'getHttpKernel_BasicService',
@@ -299,6 +305,12 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
             'plugin.manager.display_variant' => 'getPlugin_Manager_DisplayVariantService',
             'plugin.manager.editor' => 'getPlugin_Manager_EditorService',
             'plugin.manager.element_info' => 'getPlugin_Manager_ElementInfoService',
+            'plugin.manager.entity_browser.display' => 'getPlugin_Manager_EntityBrowser_DisplayService',
+            'plugin.manager.entity_browser.field_widget_display' => 'getPlugin_Manager_EntityBrowser_FieldWidgetDisplayService',
+            'plugin.manager.entity_browser.selection_display' => 'getPlugin_Manager_EntityBrowser_SelectionDisplayService',
+            'plugin.manager.entity_browser.widget' => 'getPlugin_Manager_EntityBrowser_WidgetService',
+            'plugin.manager.entity_browser.widget_selector' => 'getPlugin_Manager_EntityBrowser_WidgetSelectorService',
+            'plugin.manager.entity_embed.display' => 'getPlugin_Manager_EntityEmbed_DisplayService',
             'plugin.manager.entity_reference_selection' => 'getPlugin_Manager_EntityReferenceSelectionService',
             'plugin.manager.field.field_type' => 'getPlugin_Manager_Field_FieldTypeService',
             'plugin.manager.field.formatter' => 'getPlugin_Manager_Field_FormatterService',
@@ -1302,6 +1314,8 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
         $this->services['breadcrumb'] = $instance = new \Drupal\Core\Breadcrumb\BreadcrumbManager($this->get('module_handler'));
 
         $instance->addBuilder($this->get('taxonomy_term.breadcrumb'), 1002);
+        $instance->addBuilder($this->get('forum.breadcrumb.listing'), 1001);
+        $instance->addBuilder($this->get('forum.breadcrumb.node'), 1001);
         $instance->addBuilder($this->get('comment.breadcrumb'), 100);
         $instance->addBuilder($this->get('system.breadcrumb.default'), 0);
         $instance->_serviceId = 'breadcrumb';
@@ -2121,7 +2135,7 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
      */
     protected function getContainer_NamespacesService()
     {
-        $this->services['container.namespaces'] = $instance = new \ArrayObject(array('Drupal\\block' => 'core/modules/block/src', 'Drupal\\block_content' => 'core/modules/block_content/src', 'Drupal\\breakpoint' => 'core/modules/breakpoint/src', 'Drupal\\ckeditor' => 'core/modules/ckeditor/src', 'Drupal\\color' => 'core/modules/color/src', 'Drupal\\comment' => 'core/modules/comment/src', 'Drupal\\config' => 'core/modules/config/src', 'Drupal\\contact' => 'core/modules/contact/src', 'Drupal\\contextual' => 'core/modules/contextual/src', 'Drupal\\datetime' => 'core/modules/datetime/src', 'Drupal\\dblog' => 'core/modules/dblog/src', 'Drupal\\editor' => 'core/modules/editor/src', 'Drupal\\entity_reference' => 'core/modules/entity_reference/src', 'Drupal\\field' => 'core/modules/field/src', 'Drupal\\field_ui' => 'core/modules/field_ui/src', 'Drupal\\file' => 'core/modules/file/src', 'Drupal\\filter' => 'core/modules/filter/src', 'Drupal\\help' => 'core/modules/help/src', 'Drupal\\history' => 'core/modules/history/src', 'Drupal\\image' => 'core/modules/image/src', 'Drupal\\link' => 'core/modules/link/src', 'Drupal\\menu_ui' => 'core/modules/menu_ui/src', 'Drupal\\node' => 'core/modules/node/src', 'Drupal\\options' => 'core/modules/options/src', 'Drupal\\path' => 'core/modules/path/src', 'Drupal\\quickedit' => 'core/modules/quickedit/src', 'Drupal\\rdf' => 'core/modules/rdf/src', 'Drupal\\search' => 'core/modules/search/src', 'Drupal\\shortcut' => 'core/modules/shortcut/src', 'Drupal\\standard' => 'core/profiles/standard/src', 'Drupal\\system' => 'core/modules/system/src', 'Drupal\\taxonomy' => 'core/modules/taxonomy/src', 'Drupal\\text' => 'core/modules/text/src', 'Drupal\\toolbar' => 'core/modules/toolbar/src', 'Drupal\\tour' => 'core/modules/tour/src', 'Drupal\\update' => 'core/modules/update/src', 'Drupal\\user' => 'core/modules/user/src', 'Drupal\\views_ui' => 'core/modules/views_ui/src', 'Drupal\\menu_link_content' => 'core/modules/menu_link_content/src', 'Drupal\\views' => 'core/modules/views/src', 'Drupal\\Core\\TypedData' => 'core/lib/Drupal/Core/TypedData', 'Drupal\\Core\\Block' => 'core/lib/Drupal/Core/Block', 'Drupal\\Core\\Entity' => 'core/lib/Drupal/Core/Entity', 'Drupal\\Core\\Config' => 'core/lib/Drupal/Core/Config', 'Drupal\\Core\\Mail' => 'core/lib/Drupal/Core/Mail', 'Drupal\\Core\\Validation' => 'core/lib/Drupal/Core/Validation', 'Drupal\\Core\\Render' => 'core/lib/Drupal/Core/Render', 'Drupal\\Core\\Field' => 'core/lib/Drupal/Core/Field', 'Drupal\\Core\\Datetime' => 'core/lib/Drupal/Core/Datetime', 'Drupal\\Component\\Annotation' => 'core/lib/Drupal/Component/Annotation'));
+        $this->services['container.namespaces'] = $instance = new \ArrayObject(array('Drupal\\block' => 'core/modules/block/src', 'Drupal\\block_content' => 'core/modules/block_content/src', 'Drupal\\breakpoint' => 'core/modules/breakpoint/src', 'Drupal\\ckeditor' => 'core/modules/ckeditor/src', 'Drupal\\color' => 'core/modules/color/src', 'Drupal\\comment' => 'core/modules/comment/src', 'Drupal\\config' => 'core/modules/config/src', 'Drupal\\contact' => 'core/modules/contact/src', 'Drupal\\contextual' => 'core/modules/contextual/src', 'Drupal\\datetime' => 'core/modules/datetime/src', 'Drupal\\dblog' => 'core/modules/dblog/src', 'Drupal\\editor' => 'core/modules/editor/src', 'Drupal\\entity_browser' => 'modules/entity_browser/src', 'Drupal\\entity_browser_example' => 'modules/entity_browser/modules/example/src', 'Drupal\\entity_embed' => 'modules/entity_embed/src', 'Drupal\\entity_reference' => 'core/modules/entity_reference/src', 'Drupal\\field' => 'core/modules/field/src', 'Drupal\\field_ui' => 'core/modules/field_ui/src', 'Drupal\\file' => 'core/modules/file/src', 'Drupal\\filter' => 'core/modules/filter/src', 'Drupal\\help' => 'core/modules/help/src', 'Drupal\\history' => 'core/modules/history/src', 'Drupal\\image' => 'core/modules/image/src', 'Drupal\\link' => 'core/modules/link/src', 'Drupal\\menu_ui' => 'core/modules/menu_ui/src', 'Drupal\\node' => 'core/modules/node/src', 'Drupal\\options' => 'core/modules/options/src', 'Drupal\\path' => 'core/modules/path/src', 'Drupal\\quickedit' => 'core/modules/quickedit/src', 'Drupal\\rdf' => 'core/modules/rdf/src', 'Drupal\\search' => 'core/modules/search/src', 'Drupal\\shortcut' => 'core/modules/shortcut/src', 'Drupal\\system' => 'core/modules/system/src', 'Drupal\\taxonomy' => 'core/modules/taxonomy/src', 'Drupal\\text' => 'core/modules/text/src', 'Drupal\\toolbar' => 'core/modules/toolbar/src', 'Drupal\\tour' => 'core/modules/tour/src', 'Drupal\\update' => 'core/modules/update/src', 'Drupal\\user' => 'core/modules/user/src', 'Drupal\\views_ui' => 'core/modules/views_ui/src', 'Drupal\\forum' => 'core/modules/forum/src', 'Drupal\\menu_link_content' => 'core/modules/menu_link_content/src', 'Drupal\\views' => 'core/modules/views/src', 'Drupal\\standard' => 'core/profiles/standard/src', 'Drupal\\Core\\TypedData' => 'core/lib/Drupal/Core/TypedData', 'Drupal\\Core\\Block' => 'core/lib/Drupal/Core/Block', 'Drupal\\Core\\Entity' => 'core/lib/Drupal/Core/Entity', 'Drupal\\Core\\Config' => 'core/lib/Drupal/Core/Config', 'Drupal\\Core\\Mail' => 'core/lib/Drupal/Core/Mail', 'Drupal\\Core\\Validation' => 'core/lib/Drupal/Core/Validation', 'Drupal\\Core\\Render' => 'core/lib/Drupal/Core/Render', 'Drupal\\Core\\Field' => 'core/lib/Drupal/Core/Field', 'Drupal\\Core\\Datetime' => 'core/lib/Drupal/Core/Datetime', 'Drupal\\Component\\Annotation' => 'core/lib/Drupal/Component/Annotation'));
 
         $instance->_serviceId = 'container.namespaces';
 
@@ -2607,6 +2621,40 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
         $this->services['entity.query.sql'] = $instance = new \Drupal\Core\Entity\Query\Sql\QueryFactory($this->get('database'));
 
         $instance->_serviceId = 'entity.query.sql';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'entity_browser.route_subscriber' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\RouteSubscriber A Drupal\entity_browser\RouteSubscriber instance.
+     */
+    protected function getEntityBrowser_RouteSubscriberService()
+    {
+        $this->services['entity_browser.route_subscriber'] = $instance = new \Drupal\entity_browser\RouteSubscriber($this->get('entity.manager'), $this->get('plugin.manager.entity_browser.display'), $this->get('entity.query'));
+
+        $instance->_serviceId = 'entity_browser.route_subscriber';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'entity_embed.post_render_cache' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_embed\EntityEmbedPostRenderCache A Drupal\entity_embed\EntityEmbedPostRenderCache instance.
+     */
+    protected function getEntityEmbed_PostRenderCacheService()
+    {
+        $this->services['entity_embed.post_render_cache'] = $instance = new \Drupal\entity_embed\EntityEmbedPostRenderCache($this->get('entity.manager'), $this->get('module_handler'), $this->get('plugin.manager.entity_embed.display'));
+
+        $instance->_serviceId = 'entity_embed.post_render_cache';
 
         return $instance;
     }
@@ -3396,6 +3444,74 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
         $this->services['form_validator'] = $instance = new \Drupal\Core\Form\FormValidator($this->get('request_stack'), $this->get('string_translation'), $this->get('csrf_token'), $this->get('logger.channel.form'));
 
         $instance->_serviceId = 'form_validator';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'forum.breadcrumb.listing' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\forum\Breadcrumb\ForumListingBreadcrumbBuilder A Drupal\forum\Breadcrumb\ForumListingBreadcrumbBuilder instance.
+     */
+    protected function getForum_Breadcrumb_ListingService()
+    {
+        $this->services['forum.breadcrumb.listing'] = $instance = new \Drupal\forum\Breadcrumb\ForumListingBreadcrumbBuilder($this->get('entity.manager'), $this->get('config.factory'), $this->get('forum_manager'));
+
+        $instance->_serviceId = 'forum.breadcrumb.listing';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'forum.breadcrumb.node' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\forum\Breadcrumb\ForumNodeBreadcrumbBuilder A Drupal\forum\Breadcrumb\ForumNodeBreadcrumbBuilder instance.
+     */
+    protected function getForum_Breadcrumb_NodeService()
+    {
+        $this->services['forum.breadcrumb.node'] = $instance = new \Drupal\forum\Breadcrumb\ForumNodeBreadcrumbBuilder($this->get('entity.manager'), $this->get('config.factory'), $this->get('forum_manager'));
+
+        $instance->_serviceId = 'forum.breadcrumb.node';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'forum.index_storage' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\forum\ForumIndexStorage A Drupal\forum\ForumIndexStorage instance.
+     */
+    protected function getForum_IndexStorageService()
+    {
+        $this->services['forum.index_storage'] = $instance = new \Drupal\forum\ForumIndexStorage($this->get('database'), $this->get('forum_manager'));
+
+        $instance->_serviceId = 'forum.index_storage';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'forum_manager' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\forum\ForumManager A Drupal\forum\ForumManager instance.
+     */
+    protected function getForumManagerService()
+    {
+        $this->services['forum_manager'] = $instance = new \Drupal\forum\ForumManager($this->get('config.factory'), $this->get('entity.manager'), $this->get('database'), $this->get('string_translation'), $this->get('comment.manager'));
+
+        $instance->_serviceId = 'forum_manager';
 
         return $instance;
     }
@@ -4266,7 +4382,7 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
      */
     protected function getModuleHandlerService()
     {
-        $this->services['module_handler'] = $instance = new \Drupal\Core\Extension\ModuleHandler($this->get('app.root'), array('block' => array('type' => 'module', 'pathname' => 'core/modules/block/block.info.yml', 'filename' => 'block.module'), 'block_content' => array('type' => 'module', 'pathname' => 'core/modules/block_content/block_content.info.yml', 'filename' => 'block_content.module'), 'breakpoint' => array('type' => 'module', 'pathname' => 'core/modules/breakpoint/breakpoint.info.yml', 'filename' => 'breakpoint.module'), 'ckeditor' => array('type' => 'module', 'pathname' => 'core/modules/ckeditor/ckeditor.info.yml', 'filename' => 'ckeditor.module'), 'color' => array('type' => 'module', 'pathname' => 'core/modules/color/color.info.yml', 'filename' => 'color.module'), 'comment' => array('type' => 'module', 'pathname' => 'core/modules/comment/comment.info.yml', 'filename' => 'comment.module'), 'config' => array('type' => 'module', 'pathname' => 'core/modules/config/config.info.yml', 'filename' => 'config.module'), 'contact' => array('type' => 'module', 'pathname' => 'core/modules/contact/contact.info.yml', 'filename' => 'contact.module'), 'contextual' => array('type' => 'module', 'pathname' => 'core/modules/contextual/contextual.info.yml', 'filename' => 'contextual.module'), 'datetime' => array('type' => 'module', 'pathname' => 'core/modules/datetime/datetime.info.yml', 'filename' => 'datetime.module'), 'dblog' => array('type' => 'module', 'pathname' => 'core/modules/dblog/dblog.info.yml', 'filename' => 'dblog.module'), 'editor' => array('type' => 'module', 'pathname' => 'core/modules/editor/editor.info.yml', 'filename' => 'editor.module'), 'entity_reference' => array('type' => 'module', 'pathname' => 'core/modules/entity_reference/entity_reference.info.yml', 'filename' => 'entity_reference.module'), 'field' => array('type' => 'module', 'pathname' => 'core/modules/field/field.info.yml', 'filename' => 'field.module'), 'field_ui' => array('type' => 'module', 'pathname' => 'core/modules/field_ui/field_ui.info.yml', 'filename' => 'field_ui.module'), 'file' => array('type' => 'module', 'pathname' => 'core/modules/file/file.info.yml', 'filename' => 'file.module'), 'filter' => array('type' => 'module', 'pathname' => 'core/modules/filter/filter.info.yml', 'filename' => 'filter.module'), 'help' => array('type' => 'module', 'pathname' => 'core/modules/help/help.info.yml', 'filename' => 'help.module'), 'history' => array('type' => 'module', 'pathname' => 'core/modules/history/history.info.yml', 'filename' => 'history.module'), 'image' => array('type' => 'module', 'pathname' => 'core/modules/image/image.info.yml', 'filename' => 'image.module'), 'link' => array('type' => 'module', 'pathname' => 'core/modules/link/link.info.yml', 'filename' => 'link.module'), 'menu_ui' => array('type' => 'module', 'pathname' => 'core/modules/menu_ui/menu_ui.info.yml', 'filename' => 'menu_ui.module'), 'node' => array('type' => 'module', 'pathname' => 'core/modules/node/node.info.yml', 'filename' => 'node.module'), 'options' => array('type' => 'module', 'pathname' => 'core/modules/options/options.info.yml', 'filename' => 'options.module'), 'path' => array('type' => 'module', 'pathname' => 'core/modules/path/path.info.yml', 'filename' => 'path.module'), 'quickedit' => array('type' => 'module', 'pathname' => 'core/modules/quickedit/quickedit.info.yml', 'filename' => 'quickedit.module'), 'rdf' => array('type' => 'module', 'pathname' => 'core/modules/rdf/rdf.info.yml', 'filename' => 'rdf.module'), 'search' => array('type' => 'module', 'pathname' => 'core/modules/search/search.info.yml', 'filename' => 'search.module'), 'shortcut' => array('type' => 'module', 'pathname' => 'core/modules/shortcut/shortcut.info.yml', 'filename' => 'shortcut.module'), 'standard' => array('type' => 'profile', 'pathname' => 'core/profiles/standard/standard.info.yml', 'filename' => 'standard.profile'), 'system' => array('type' => 'module', 'pathname' => 'core/modules/system/system.info.yml', 'filename' => 'system.module'), 'taxonomy' => array('type' => 'module', 'pathname' => 'core/modules/taxonomy/taxonomy.info.yml', 'filename' => 'taxonomy.module'), 'text' => array('type' => 'module', 'pathname' => 'core/modules/text/text.info.yml', 'filename' => 'text.module'), 'toolbar' => array('type' => 'module', 'pathname' => 'core/modules/toolbar/toolbar.info.yml', 'filename' => 'toolbar.module'), 'tour' => array('type' => 'module', 'pathname' => 'core/modules/tour/tour.info.yml', 'filename' => 'tour.module'), 'update' => array('type' => 'module', 'pathname' => 'core/modules/update/update.info.yml', 'filename' => 'update.module'), 'user' => array('type' => 'module', 'pathname' => 'core/modules/user/user.info.yml', 'filename' => 'user.module'), 'views_ui' => array('type' => 'module', 'pathname' => 'core/modules/views_ui/views_ui.info.yml', 'filename' => 'views_ui.module'), 'menu_link_content' => array('type' => 'module', 'pathname' => 'core/modules/menu_link_content/menu_link_content.info.yml', 'filename' => 'menu_link_content.module'), 'views' => array('type' => 'module', 'pathname' => 'core/modules/views/views.info.yml', 'filename' => 'views.module')), $this->get('cache.bootstrap'));
+        $this->services['module_handler'] = $instance = new \Drupal\Core\Extension\ModuleHandler($this->get('app.root'), array('block' => array('type' => 'module', 'pathname' => 'core/modules/block/block.info.yml', 'filename' => 'block.module'), 'block_content' => array('type' => 'module', 'pathname' => 'core/modules/block_content/block_content.info.yml', 'filename' => 'block_content.module'), 'breakpoint' => array('type' => 'module', 'pathname' => 'core/modules/breakpoint/breakpoint.info.yml', 'filename' => 'breakpoint.module'), 'ckeditor' => array('type' => 'module', 'pathname' => 'core/modules/ckeditor/ckeditor.info.yml', 'filename' => 'ckeditor.module'), 'color' => array('type' => 'module', 'pathname' => 'core/modules/color/color.info.yml', 'filename' => 'color.module'), 'comment' => array('type' => 'module', 'pathname' => 'core/modules/comment/comment.info.yml', 'filename' => 'comment.module'), 'config' => array('type' => 'module', 'pathname' => 'core/modules/config/config.info.yml', 'filename' => 'config.module'), 'contact' => array('type' => 'module', 'pathname' => 'core/modules/contact/contact.info.yml', 'filename' => 'contact.module'), 'contextual' => array('type' => 'module', 'pathname' => 'core/modules/contextual/contextual.info.yml', 'filename' => 'contextual.module'), 'datetime' => array('type' => 'module', 'pathname' => 'core/modules/datetime/datetime.info.yml', 'filename' => 'datetime.module'), 'dblog' => array('type' => 'module', 'pathname' => 'core/modules/dblog/dblog.info.yml', 'filename' => 'dblog.module'), 'editor' => array('type' => 'module', 'pathname' => 'core/modules/editor/editor.info.yml', 'filename' => 'editor.module'), 'entity_browser' => array('type' => 'module', 'pathname' => 'modules/entity_browser/entity_browser.info.yml', 'filename' => 'entity_browser.module'), 'entity_browser_example' => array('type' => 'module', 'pathname' => 'modules/entity_browser/modules/example/entity_browser_example.info.yml', 'filename' => NULL), 'entity_embed' => array('type' => 'module', 'pathname' => 'modules/entity_embed/entity_embed.info.yml', 'filename' => 'entity_embed.module'), 'entity_reference' => array('type' => 'module', 'pathname' => 'core/modules/entity_reference/entity_reference.info.yml', 'filename' => 'entity_reference.module'), 'field' => array('type' => 'module', 'pathname' => 'core/modules/field/field.info.yml', 'filename' => 'field.module'), 'field_ui' => array('type' => 'module', 'pathname' => 'core/modules/field_ui/field_ui.info.yml', 'filename' => 'field_ui.module'), 'file' => array('type' => 'module', 'pathname' => 'core/modules/file/file.info.yml', 'filename' => 'file.module'), 'filter' => array('type' => 'module', 'pathname' => 'core/modules/filter/filter.info.yml', 'filename' => 'filter.module'), 'help' => array('type' => 'module', 'pathname' => 'core/modules/help/help.info.yml', 'filename' => 'help.module'), 'history' => array('type' => 'module', 'pathname' => 'core/modules/history/history.info.yml', 'filename' => 'history.module'), 'image' => array('type' => 'module', 'pathname' => 'core/modules/image/image.info.yml', 'filename' => 'image.module'), 'link' => array('type' => 'module', 'pathname' => 'core/modules/link/link.info.yml', 'filename' => 'link.module'), 'menu_ui' => array('type' => 'module', 'pathname' => 'core/modules/menu_ui/menu_ui.info.yml', 'filename' => 'menu_ui.module'), 'node' => array('type' => 'module', 'pathname' => 'core/modules/node/node.info.yml', 'filename' => 'node.module'), 'options' => array('type' => 'module', 'pathname' => 'core/modules/options/options.info.yml', 'filename' => 'options.module'), 'path' => array('type' => 'module', 'pathname' => 'core/modules/path/path.info.yml', 'filename' => 'path.module'), 'quickedit' => array('type' => 'module', 'pathname' => 'core/modules/quickedit/quickedit.info.yml', 'filename' => 'quickedit.module'), 'rdf' => array('type' => 'module', 'pathname' => 'core/modules/rdf/rdf.info.yml', 'filename' => 'rdf.module'), 'search' => array('type' => 'module', 'pathname' => 'core/modules/search/search.info.yml', 'filename' => 'search.module'), 'shortcut' => array('type' => 'module', 'pathname' => 'core/modules/shortcut/shortcut.info.yml', 'filename' => 'shortcut.module'), 'system' => array('type' => 'module', 'pathname' => 'core/modules/system/system.info.yml', 'filename' => 'system.module'), 'taxonomy' => array('type' => 'module', 'pathname' => 'core/modules/taxonomy/taxonomy.info.yml', 'filename' => 'taxonomy.module'), 'text' => array('type' => 'module', 'pathname' => 'core/modules/text/text.info.yml', 'filename' => 'text.module'), 'toolbar' => array('type' => 'module', 'pathname' => 'core/modules/toolbar/toolbar.info.yml', 'filename' => 'toolbar.module'), 'tour' => array('type' => 'module', 'pathname' => 'core/modules/tour/tour.info.yml', 'filename' => 'tour.module'), 'update' => array('type' => 'module', 'pathname' => 'core/modules/update/update.info.yml', 'filename' => 'update.module'), 'user' => array('type' => 'module', 'pathname' => 'core/modules/user/user.info.yml', 'filename' => 'user.module'), 'views_ui' => array('type' => 'module', 'pathname' => 'core/modules/views_ui/views_ui.info.yml', 'filename' => 'views_ui.module'), 'forum' => array('type' => 'module', 'pathname' => 'core/modules/forum/forum.info.yml', 'filename' => 'forum.module'), 'menu_link_content' => array('type' => 'module', 'pathname' => 'core/modules/menu_link_content/menu_link_content.info.yml', 'filename' => 'menu_link_content.module'), 'views' => array('type' => 'module', 'pathname' => 'core/modules/views/views.info.yml', 'filename' => 'views.module'), 'standard' => array('type' => 'profile', 'pathname' => 'core/profiles/standard/standard.info.yml', 'filename' => 'standard.profile')), $this->get('cache.bootstrap'));
 
         $instance->_serviceId = 'module_handler';
 
@@ -4832,6 +4948,12 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
         $instance->addCachedDiscovery($this->get('breakpoint.manager'));
         $instance->addCachedDiscovery($this->get('plugin.manager.ckeditor.plugin'));
         $instance->addCachedDiscovery($this->get('plugin.manager.editor'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_browser.display'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_browser.selection_display'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_browser.widget'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_browser.widget_selector'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_browser.field_widget_display'));
+        $instance->addCachedDiscovery($this->get('plugin.manager.entity_embed.display'));
         $instance->addCachedDiscovery($this->get('plugin.manager.filter'));
         $instance->addCachedDiscovery($this->get('plugin.manager.image.effect'));
         $instance->addCachedDiscovery($this->get('plugin.manager.quickedit.editor'));
@@ -4993,6 +5115,108 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
         $this->services['plugin.manager.element_info'] = $instance = new \Drupal\Core\Render\ElementInfoManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('cache_tags.invalidator'), $this->get('module_handler'), $this->get('theme.manager'));
 
         $instance->_serviceId = 'plugin.manager.element_info';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_browser.display' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\DisplayManager A Drupal\entity_browser\DisplayManager instance.
+     */
+    protected function getPlugin_Manager_EntityBrowser_DisplayService()
+    {
+        $this->services['plugin.manager.entity_browser.display'] = $instance = new \Drupal\entity_browser\DisplayManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_browser.display';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_browser.field_widget_display' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\FieldWidgetDisplayManager A Drupal\entity_browser\FieldWidgetDisplayManager instance.
+     */
+    protected function getPlugin_Manager_EntityBrowser_FieldWidgetDisplayService()
+    {
+        $this->services['plugin.manager.entity_browser.field_widget_display'] = $instance = new \Drupal\entity_browser\FieldWidgetDisplayManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_browser.field_widget_display';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_browser.selection_display' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\SelectionDisplayManager A Drupal\entity_browser\SelectionDisplayManager instance.
+     */
+    protected function getPlugin_Manager_EntityBrowser_SelectionDisplayService()
+    {
+        $this->services['plugin.manager.entity_browser.selection_display'] = $instance = new \Drupal\entity_browser\SelectionDisplayManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_browser.selection_display';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_browser.widget' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\WidgetManager A Drupal\entity_browser\WidgetManager instance.
+     */
+    protected function getPlugin_Manager_EntityBrowser_WidgetService()
+    {
+        $this->services['plugin.manager.entity_browser.widget'] = $instance = new \Drupal\entity_browser\WidgetManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_browser.widget';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_browser.widget_selector' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_browser\WidgetSelectorManager A Drupal\entity_browser\WidgetSelectorManager instance.
+     */
+    protected function getPlugin_Manager_EntityBrowser_WidgetSelectorService()
+    {
+        $this->services['plugin.manager.entity_browser.widget_selector'] = $instance = new \Drupal\entity_browser\WidgetSelectorManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_browser.widget_selector';
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'plugin.manager.entity_embed.display' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager A Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager instance.
+     */
+    protected function getPlugin_Manager_EntityEmbed_DisplayService()
+    {
+        $this->services['plugin.manager.entity_embed.display'] = $instance = new \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager($this->get('container.namespaces'), $this->get('cache.discovery'), $this->get('module_handler'));
+
+        $instance->_serviceId = 'plugin.manager.entity_embed.display';
 
         return $instance;
     }
@@ -7670,6 +7894,21 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                     'pathname' => 'core/modules/editor/editor.info.yml',
                     'filename' => 'editor.module',
                 ),
+                'entity_browser' => array(
+                    'type' => 'module',
+                    'pathname' => 'modules/entity_browser/entity_browser.info.yml',
+                    'filename' => 'entity_browser.module',
+                ),
+                'entity_browser_example' => array(
+                    'type' => 'module',
+                    'pathname' => 'modules/entity_browser/modules/example/entity_browser_example.info.yml',
+                    'filename' => NULL,
+                ),
+                'entity_embed' => array(
+                    'type' => 'module',
+                    'pathname' => 'modules/entity_embed/entity_embed.info.yml',
+                    'filename' => 'entity_embed.module',
+                ),
                 'entity_reference' => array(
                     'type' => 'module',
                     'pathname' => 'core/modules/entity_reference/entity_reference.info.yml',
@@ -7755,11 +7994,6 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                     'pathname' => 'core/modules/shortcut/shortcut.info.yml',
                     'filename' => 'shortcut.module',
                 ),
-                'standard' => array(
-                    'type' => 'profile',
-                    'pathname' => 'core/profiles/standard/standard.info.yml',
-                    'filename' => 'standard.profile',
-                ),
                 'system' => array(
                     'type' => 'module',
                     'pathname' => 'core/modules/system/system.info.yml',
@@ -7800,6 +8034,11 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                     'pathname' => 'core/modules/views_ui/views_ui.info.yml',
                     'filename' => 'views_ui.module',
                 ),
+                'forum' => array(
+                    'type' => 'module',
+                    'pathname' => 'core/modules/forum/forum.info.yml',
+                    'filename' => 'forum.module',
+                ),
                 'menu_link_content' => array(
                     'type' => 'module',
                     'pathname' => 'core/modules/menu_link_content/menu_link_content.info.yml',
@@ -7809,6 +8048,11 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                     'type' => 'module',
                     'pathname' => 'core/modules/views/views.info.yml',
                     'filename' => 'views.module',
+                ),
+                'standard' => array(
+                    'type' => 'profile',
+                    'pathname' => 'core/profiles/standard/standard.info.yml',
+                    'filename' => 'standard.profile',
                 ),
             ),
             'container.namespaces' => array(
@@ -7824,6 +8068,9 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                 'Drupal\\datetime' => 'core/modules/datetime/src',
                 'Drupal\\dblog' => 'core/modules/dblog/src',
                 'Drupal\\editor' => 'core/modules/editor/src',
+                'Drupal\\entity_browser' => 'modules/entity_browser/src',
+                'Drupal\\entity_browser_example' => 'modules/entity_browser/modules/example/src',
+                'Drupal\\entity_embed' => 'modules/entity_embed/src',
                 'Drupal\\entity_reference' => 'core/modules/entity_reference/src',
                 'Drupal\\field' => 'core/modules/field/src',
                 'Drupal\\field_ui' => 'core/modules/field_ui/src',
@@ -7841,7 +8088,6 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                 'Drupal\\rdf' => 'core/modules/rdf/src',
                 'Drupal\\search' => 'core/modules/search/src',
                 'Drupal\\shortcut' => 'core/modules/shortcut/src',
-                'Drupal\\standard' => 'core/profiles/standard/src',
                 'Drupal\\system' => 'core/modules/system/src',
                 'Drupal\\taxonomy' => 'core/modules/taxonomy/src',
                 'Drupal\\text' => 'core/modules/text/src',
@@ -7850,8 +8096,10 @@ class service_container_prod extends \Drupal\Core\DependencyInjection\Container
                 'Drupal\\update' => 'core/modules/update/src',
                 'Drupal\\user' => 'core/modules/user/src',
                 'Drupal\\views_ui' => 'core/modules/views_ui/src',
+                'Drupal\\forum' => 'core/modules/forum/src',
                 'Drupal\\menu_link_content' => 'core/modules/menu_link_content/src',
                 'Drupal\\views' => 'core/modules/views/src',
+                'Drupal\\standard' => 'core/profiles/standard/src',
                 'Drupal\\Core\\TypedData' => 'core/lib/Drupal/Core/TypedData',
                 'Drupal\\Core\\Block' => 'core/lib/Drupal/Core/Block',
                 'Drupal\\Core\\Entity' => 'core/lib/Drupal/Core/Entity',
