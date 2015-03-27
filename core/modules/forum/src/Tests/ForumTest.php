@@ -341,7 +341,12 @@ class ForumTest extends WebTestBase {
     // Test relations widget exists.
     $relations_widget = $this->xpath("//details[@id='edit-relations']");
     $this->assertTrue(isset($relations_widget[0]), 'Relations widget element found.');
+	 // Test for forum specific descriptions and labels.
++    $this->verifyForumForm('forum');
++    // Test for container specific descriptions and labels.
++    $this->verifyForumForm('container');  
   }
+
 
   /**
    * Edits the forum taxonomy.
@@ -663,5 +668,34 @@ class ForumTest extends WebTestBase {
       $node = $this->createForumTopic($this->forum, FALSE);
       $this->nids[] = $node->id();
     }
+  }
+
+  /**
+   * Verifies if forum form descriptions and labels are correct.
+   *
+   * @param string $type
+   *   The forum type (forum container or forum).
+   */
+  protected function verifyForumForm($type) {
+    $this->drupalGet('admin/structure/forum/add/' . $type);
+    switch ($type) {
+      case 'forum':
+        $this->assertRaw('Forum name', 'Forum title field label found');
+        $this->assertRaw('Short but meaningful name for this collection of threaded discussions.', 'Forum title field description found.');
+        $this->assertRaw('Forums are displayed in ascending order by weight.', 'Forum weight field description found.');
+        $this->assertRaw('Description and guidelines for discussions within this forum.', 'Forum description field description found.');
+        break;
+
+      case 'container':
+        $this->assertRaw('Container name', 'Container title field label found.');
+        $this->assertRaw('Short but meaningful name for this collection of related forums.', 'Container title field description found.');
+        $this->assertRaw('Containers are displayed in ascending order by weight.', 'Container weight field description found.');
+        $this->assertRaw('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.', 'Container parent field description found.');
+        $this->assertRaw('Description and guidelines for discussions within this forum.', 'Container description field description found.');
+       break;
+
+      default:
+        break;
+   }
   }
 }
