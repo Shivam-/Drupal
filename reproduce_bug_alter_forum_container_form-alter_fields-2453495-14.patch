@@ -1,0 +1,160 @@
+diff --git a/core/modules/forum/src/Form/ContainerForm.php b/core/modules/forum/src/Form/ContainerForm.php
+old mode 100755
+new mode 100644
+index adaff64..b7f62fc
+--- a/core/modules/forum/src/Form/ContainerForm.php
++++ b/core/modules/forum/src/Form/ContainerForm.php
+@@ -28,14 +28,15 @@ public function form(array $form, FormStateInterface $form_state) {
+     $taxonomy_term = $this->entity;
+     // Build the bulk of the form from the parent forum form.
+     $form = parent::form($form, $form_state, $taxonomy_term);
+-    $this->forumFormType = $this->t('forum container');
+- 
++
+     // Set the title and description of the name field.
+     $form['name']['#title'] = $this->t('Container name');
+     $form['name']['#description'] = $this->t('Short but meaningful name for this collection of related forums.');
+ 
+-     // Update the description.
+-    $form['weight']['#description'] = $this->t('Containers are displayed in ascending order by weight.');
++    // Alternate description for the container parent.
++    $form['parent'][0]['#description'] = $this->t('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.');
++    $this->forumFormType = $this->t('forum container');
++    return $form;
+   }
+ 
+   /**
+@@ -46,25 +47,5 @@ public function buildEntity(array $form, FormStateInterface $form_state) {
+     $entity->forum_container = TRUE;
+     return $entity;
+   }
+-  /**
+-   * {@inheritdoc}
+-   */
+-  public function prepareEntity() {
+-    parent::prepareEntity();
+-    // Set the title and description of the name field.
+-    $this->entity->get('name')->getDataDefinition()->setLabel('Container name');
+-    $this->entity->get('name')->getDataDefinition()->setDescription('Short but meaningful name for this collection of related forums.');
+-  }
+-
+-  /**
+-   * {@inheritdoc}
+-   */
+-  protected function forumParentSelect($tid, $title) {
+-    $parent_select = parent::forumParentSelect($tid, $title);
+-    // Change the description of the parent select.
+-    $parent_select['#description'] = $this->t('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.');
+-
+-    return $parent_select;
+-  }
+ 
+ }
+diff --git a/core/modules/forum/src/Form/ForumForm.php b/core/modules/forum/src/Form/ForumForm.php
+old mode 100755
+new mode 100644
+index fb87bb0..4641781
+--- a/core/modules/forum/src/Form/ForumForm.php
++++ b/core/modules/forum/src/Form/ForumForm.php
+@@ -38,11 +38,16 @@ public function form(array $form, FormStateInterface $form_state) {
+     // Build the bulk of the form from the parent taxonomy term form.
+     $form = parent::form($form, $form_state, $taxonomy_term);
+ 
++    // Set the title and description of the name field.
++    $form['name']['#title'] = $this->t('Forum name');
++    $form['name']['#description'] = $this->t('Short but meaningful name for this collection of threaded discussions.');
++
++    // Change the description.
++    $form['description']['#description'] = $this->t('Description and guidelines for discussions within this forum.');
+ 
+     // Re-use the weight field.
+     $form['weight'] = $form['relations']['weight'];
+-    //Description updated
+-    $form['weight']['#description'] = $this->t('Forums are displayed in ascending order by weight.Forums are displayed in ascending order by weight.');
++
+     // Remove the remaining relations fields.
+     unset($form['relations']);
+ 
+@@ -165,16 +170,5 @@ protected function forumParentSelect($tid, $title) {
+       '#required' => TRUE,
+     );
+   }
+- /**
+-   * {@inheritdoc}
+-   */
+-  public function prepareEntity() {
+-    parent::prepareEntity();
+-    // Set the title and description of the name field.
+-    $this->entity->get('name')->getDataDefinition()->setLabel('Forum name');
+-    $this->entity->get('name')->getDataDefinition()->setDescription('Short but meaningful name for this collection of threaded discussions.');
+-    // Change the description.
+-    $this->entity->get('description')->getDataDefinition()->setDescription('Description and guidelines for discussions within this forum.');
+-  }
+ 
+ }
+diff --git a/core/modules/forum/src/Tests/ForumTest.php b/core/modules/forum/src/Tests/ForumTest.php
+old mode 100755
+new mode 100644
+index 4084e71..6feb754
+--- a/core/modules/forum/src/Tests/ForumTest.php
++++ b/core/modules/forum/src/Tests/ForumTest.php
+@@ -117,13 +117,7 @@ function testForum() {
+     //Check that the basic forum install creates a default forum topic
+     $this->drupalGet('/forum');
+     // Look for the "General discussion" default forum
+-    $this->assertRaw(t('<a href="'. Url::fromRoute('forum.page', ['taxonomy_term' => 1])->toString() .'">General discussion</a>'), "Found the default forum at the /forum listing");
+-
+-    // Check the presence of expected cache tags.
+-    $this->assertCacheTag('config:forum.settings');
+-
+-    $this->drupalGet(Url::fromRoute('forum.page', ['taxonomy_term' => 1]));
+-    $this->assertCacheTag('config:forum.settings');
++    $this->assertRaw(t('<a href="'. Url::fromRoute('forum.page', ['taxonomy_term' => 1]) .'">General discussion</a>'), "Found the default forum at the /forum listing");
+ 
+     // Do the admin tests.
+     $this->doAdminTests($this->admin_user);
+@@ -347,10 +341,6 @@ private function doAdminTests($user) {
+     // Test relations widget exists.
+     $relations_widget = $this->xpath("//details[@id='edit-relations']");
+     $this->assertTrue(isset($relations_widget[0]), 'Relations widget element found.');
+-        // Test for forum specific descriptions and labels.
+-    $this->verifyForumForm('forum');
+-    // Test for container specific descriptions and labels.
+-    $this->verifyForumForm('container');
+   }
+ 
+   /**
+@@ -674,33 +664,4 @@ private function generateForumTopics() {
+       $this->nids[] = $node->id();
+     }
+   }
+-   /**
+-   * Verifies if forum form descriptions and labels are correct.
+-   *
+-   * @param string $type
+-   *   The forum type (forum container or forum).
+-   */
+- protected function verifyForumForm($type) {
+-    $this->drupalGet('admin/structure/forum/add/' . $type);
+-    switch ($type) {
+-      case 'forum':
+-        $this->assertRaw('Forum name', 'Forum title field label found');
+-        $this->assertRaw('Short but meaningful name for this collection of threaded discussions.', 'Forum title field description found.');
+-        $this->assertRaw('Forums are displayed in ascending order by weight.', 'Forum weight field description found.');
+-        $this->assertRaw('Description and guidelines for discussions within this forum.', 'Forum description field description found.');
+-        break;
+-
+-      case 'container':
+-        $this->assertRaw('Container name', 'Container title field label found.');
+-        $this->assertRaw('Short but meaningful name for this collection of related forums.', 'Container title field description found.');
+-        $this->assertRaw('Containers are displayed in ascending order by weight.', 'Container weight field description found.');
+-        $this->assertRaw('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.', 'Container parent field description found.');
+-        $this->assertRaw('Description and guidelines for discussions within this forum.', 'Container description field description found.');
+-        break;
+-
+-      default:
+-        break;
+-   }
+-  }
+-
+ }
