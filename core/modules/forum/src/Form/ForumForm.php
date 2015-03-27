@@ -38,16 +38,11 @@ class ForumForm extends TermForm {
     // Build the bulk of the form from the parent taxonomy term form.
     $form = parent::form($form, $form_state, $taxonomy_term);
 
-    // Set the title and description of the name field.
-    $form['name']['#title'] = $this->t('Forum name');
-    $form['name']['#description'] = $this->t('Short but meaningful name for this collection of threaded discussions.');
-
-    // Change the description.
-    $form['description']['#description'] = $this->t('Description and guidelines for discussions within this forum.');
 
     // Re-use the weight field.
     $form['weight'] = $form['relations']['weight'];
-
+    //Description updated
+    $form['weight']['#description'] = $this->t('Forums are displayed in ascending order by weight.Forums are displayed in ascending order by weight.');
     // Remove the remaining relations fields.
     unset($form['relations']);
 
@@ -169,6 +164,17 @@ class ForumForm extends TermForm {
       '#description' => $description,
       '#required' => TRUE,
     );
+  }
+ /**
+   * {@inheritdoc}
+   */
+  public function prepareEntity() {
+    parent::prepareEntity();
+    // Set the title and description of the name field.
+    $this->entity->get('name')->getDataDefinition()->setLabel('Forum name');
+    $this->entity->get('name')->getDataDefinition()->setDescription('Short but meaningful name for this collection of threaded discussions.');
+    // Change the description.
+    $this->entity->get('description')->getDataDefinition()->setDescription('Description and guidelines for discussions within this forum.');
   }
 
 }

@@ -28,15 +28,14 @@ class ContainerForm extends ForumForm {
     $taxonomy_term = $this->entity;
     // Build the bulk of the form from the parent forum form.
     $form = parent::form($form, $form_state, $taxonomy_term);
-
+    $this->forumFormType = $this->t('forum container');
+ 
     // Set the title and description of the name field.
     $form['name']['#title'] = $this->t('Container name');
     $form['name']['#description'] = $this->t('Short but meaningful name for this collection of related forums.');
 
-    // Alternate description for the container parent.
-    $form['parent'][0]['#description'] = $this->t('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.');
-    $this->forumFormType = $this->t('forum container');
-    return $form;
+     // Update the description.
+    $form['weight']['#description'] = $this->t('Containers are displayed in ascending order by weight.');
   }
 
   /**
@@ -46,6 +45,26 @@ class ContainerForm extends ForumForm {
     $entity = parent::buildEntity($form, $form_state);
     $entity->forum_container = TRUE;
     return $entity;
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareEntity() {
+    parent::prepareEntity();
+    // Set the title and description of the name field.
+    $this->entity->get('name')->getDataDefinition()->setLabel('Container name');
+    $this->entity->get('name')->getDataDefinition()->setDescription('Short but meaningful name for this collection of related forums.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function forumParentSelect($tid, $title) {
+    $parent_select = parent::forumParentSelect($tid, $title);
+    // Change the description of the parent select.
+    $parent_select['#description'] = $this->t('Containers are usually placed at the top (root) level, but may also be placed inside another container or forum.');
+
+    return $parent_select;
   }
 
 }
