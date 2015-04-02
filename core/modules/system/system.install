@@ -239,7 +239,7 @@ function system_requirements($phase) {
     if (!drupal_verify_install_file($conf_path, FILE_NOT_WRITABLE, 'dir')) {
       $conf_errors[] = t("The directory %file is not protected from modifications and poses a security risk. You must change the directory's permissions to be non-writable.", array('%file' => $conf_path));
     }
-    foreach (array('settings.php', 'settings.local.php', 'services.yml') as $conf_file) {
+    foreach (array('settings.php', 'local.settings.php', 'services.yml') as $conf_file) {
       $full_path = $conf_path . '/' . $conf_file;
       if (file_exists($full_path) && !drupal_verify_install_file($full_path, FILE_EXIST|FILE_READABLE|FILE_NOT_WRITABLE)) {
         $conf_errors[] = t("The file %file is not protected from modifications and poses a security risk. You must change the file's permissions to be non-writable.", array('%file' => $full_path));
