@@ -1,0 +1,41 @@
+diff --git a/core/modules/taxonomy/src/Tests/VocabularyUiTest.php b/core/modules/taxonomy/src/Tests/VocabularyUiTest.php
+index aa24cee..3a34c2e 100644
+--- a/core/modules/taxonomy/src/Tests/VocabularyUiTest.php
++++ b/core/modules/taxonomy/src/Tests/VocabularyUiTest.php
+@@ -8,6 +8,7 @@
+ namespace Drupal\taxonomy\Tests;
+ use Drupal\Component\Utility\Unicode;
+ 
++use Drupal\Core\Url;
+ use Drupal\taxonomy\Entity\Vocabulary;
+ 
+ /**
+@@ -50,6 +51,7 @@ function testVocabularyInterface() {
+     // Edit the vocabulary.
+     $this->drupalGet('admin/structure/taxonomy');
+     $this->assertText($edit['name'], 'Vocabulary found in the vocabulary overview listing.');
++    $this->assertLinkByHref(Url::fromRoute('entity.taxonomy_term.add_form', ['taxonomy_vocabulary' => $edit['vid']])->toString());
+     $this->clickLink(t('Edit vocabulary'));
+     $edit = array();
+     $edit['name'] = $this->randomMachineName();
+diff --git a/core/modules/taxonomy/src/VocabularyListBuilder.php b/core/modules/taxonomy/src/VocabularyListBuilder.php
+index 013d900..fe196c9 100644
+--- a/core/modules/taxonomy/src/VocabularyListBuilder.php
++++ b/core/modules/taxonomy/src/VocabularyListBuilder.php
+@@ -10,6 +10,7 @@
+ use Drupal\Core\Config\Entity\DraggableListBuilder;
+ use Drupal\Core\Entity\EntityInterface;
+ use Drupal\Core\Form\FormStateInterface;
++use Drupal\Core\Url;
+ 
+ /**
+  * Defines a class to build a listing of taxonomy vocabulary entities.
+@@ -48,7 +49,7 @@ public function getDefaultOperations(EntityInterface $entity) {
+     $operations['add'] = array(
+       'title' => t('Add terms'),
+       'weight' => 10,
+-      'url' => $entity->urlInfo('add-form'),
++      'url' => Url::fromRoute('entity.taxonomy_term.add_form', ['taxonomy_vocabulary' => $entity->id()]),
+     );
+     unset($operations['delete']);
+ 
