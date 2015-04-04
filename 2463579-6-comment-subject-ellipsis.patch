@@ -1,0 +1,32 @@
+diff --git a/core/modules/comment/src/CommentForm.php b/core/modules/comment/src/CommentForm.php
+index 65eea3e..10c2152 100644
+--- a/core/modules/comment/src/CommentForm.php
++++ b/core/modules/comment/src/CommentForm.php
+@@ -301,7 +301,7 @@ public function buildEntity(array $form, FormStateInterface $form_state) {
+       // 2) Strip out all HTML tags
+       // 3) Convert entities back to plain-text.
+       $comment_text = $comment->comment_body->processed;
+-      $comment->setSubject(Unicode::truncate(trim(Html::decodeEntities(strip_tags($comment_text))), 29, TRUE));
++      $comment->setSubject(Unicode::truncate(trim(Html::decodeEntities(strip_tags($comment_text))), 29, TRUE, TRUE));
+       // Edge cases where the comment body is populated only by HTML tags will
+       // require a default subject.
+       if ($comment->getSubject() == '') {
+diff --git a/core/modules/comment/src/Tests/CommentInterfaceTest.php b/core/modules/comment/src/Tests/CommentInterfaceTest.php
+index c775553..85e2c25 100644
+--- a/core/modules/comment/src/Tests/CommentInterfaceTest.php
++++ b/core/modules/comment/src/Tests/CommentInterfaceTest.php
+@@ -220,12 +220,12 @@ public function testAutoFilledSubject() {
+     $body_text = 'Lorem ipsum Lorem ipsum Loreming ipsum Lorem ipsum';
+     $comment1 = $this->postComment(NULL, $body_text, '', TRUE);
+     $this->assertTrue($this->commentExists($comment1), 'Form comment found.');
+-    $this->assertEqual('Lorem ipsum Lorem ipsum', $comment1->getSubject());
++    $this->assertEqual('Lorem ipsum Lorem ipsum…', $comment1->getSubject());
+ 
+     // Break at 29 characters where there's no boundary before that.
+     $body_text2 = 'LoremipsumloremipsumLoremingipsumLoremipsum';
+     $comment2 = $this->postComment(NULL, $body_text2, '', TRUE);
+-    $this->assertEqual('LoremipsumloremipsumLoremingi', $comment2->getSubject());
++    $this->assertEqual('LoremipsumloremipsumLoreming…', $comment2->getSubject());
+   }
+ 
+   /**

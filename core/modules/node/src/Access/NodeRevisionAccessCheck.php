@@ -11,6 +11,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Symfony\Component\Routing\Route;
 
@@ -132,25 +133,31 @@ class NodeRevisionAccessCheck implements AccessInterface {
         $this->access[$cid] = FALSE;
         return FALSE;
       }
-
-      // There should be at least two revisions. If the vid of the given node
-      // and the vid of the default revision differ, then we already have two
-      // different revisions so there is no need for a separate database check.
-      // Also, if you try to revert to or delete the default revision, that's
-      // not good.
-      if ($node->isDefaultRevision() && ($this->nodeStorage->countDefaultLanguageRevisions($node) == 1 || $op == 'update' || $op == 'delete')) {
-        $this->access[$cid] = FALSE;
-      }
-      elseif ($account->hasPermission('administer nodes')) {
+      // If the revisions checkbox is selected for the content type, display the
+      // revisions tab.
+      $node_type = NodeType::load($node->getType());
+      if ($node_type->isNewRevision()) {
         $this->access[$cid] = TRUE;
       }
       else {
-        // First check the access to the default revision and finally, if the
-        // node passed in is not the default revision then access to that, too.
-        $this->access[$cid] = $this->nodeAccess->access($this->nodeStorage->load($node->id()), $op, $langcode, $account) && ($node->isDefaultRevision() || $this->nodeAccess->access($node, $op, $langcode, $account));
+        // There should be at least two revisions. If the vid of the given node
+        // and the vid of the default revision differ, then we already have two
+        // different revisions so there is no need for a separate database check.
+        // Also, if you try to revert to or delete the default revision, that's
+        // not good.
+        if ($node->isDefaultRevision() && ($this->nodeStorage->countDefaultLanguageRevisions($node) == 1 || $op == 'update' || $op == 'delete')) {
+          $this->access[$cid] = FALSE;
+        }
+        elseif ($account->hasPermission('administer nodes')) {
+          $this->access[$cid] = TRUE;
+        }
+        else {
+          // First check the access to the default revision and finally, if the
+          // node passed in is not the default revision then access to that, too.
+          $this->access[$cid] = $this->nodeAccess->access($this->nodeStorage->load($node->id()), $op, $langcode, $account) && ($node->isDefaultRevision() || $this->nodeAccess->access($node, $op, $langcode, $account));
+        }
       }
     }
-
     return $this->access[$cid];
   }
 
